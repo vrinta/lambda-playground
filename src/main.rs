@@ -1,4 +1,5 @@
-use lambda_http::{run, service_fn, Body, Error, Request, Response};
+use lambda_http::{run, service_fn, Body, Error, Request, Response, RequestExt};
+// use lambda_http::aws_lambda_events::http_body::Body;
 
 /// This is the main body for the function.
 /// Write your code inside it.
@@ -6,13 +7,17 @@ use lambda_http::{run, service_fn, Body, Error, Request, Response};
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
     // Extract some useful information from the request
+    let ev = _event.query_string_parameters().to_query_string();
+
 
     // Return something that implements IntoResponse.
     // It will be serialized to the right response event automatically by the runtime
     let resp = Response::builder()
         .status(200)
-        .header("content-type", "text/html")
-        .body("Hello AWS Lambda HTTP request".into())
+        .header("content-type", "application/json")
+        .body(ev.into())
+        // ::from(_event.body().boxed()))
+        // .body("Hello AWS Lambda HTTP request".into())
         .map_err(Box::new)?;
     Ok(resp)
 }
